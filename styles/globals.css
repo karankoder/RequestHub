@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 body {
-    overflow-x: hidden;
+  overflow-x: hidden;
 }
 
 .no-scrollbar::-webkit-scrollbar {
-    display: none !important;
+  display: none !important;
 }
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-    -ms-overflow-style: none;
-    /* IE and Edge */
-    scrollbar-width: none;
-    /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
