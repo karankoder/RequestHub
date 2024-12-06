@@ -9,10 +9,26 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@requestnetwork/payment-detection": "^0.47.0",
+    "@requestnetwork/request-client.js": "^0.52.0",
+    "@requestnetwork/shared": "^0.4.0",
+    "@requestnetwork/web3-signature": "^0.8.3",
+    "@web3-onboard/coinbase": "^2.4.1",
+    "@web3-onboard/core": "^2.23.0",
+    "@web3-onboard/gnosis": "^2.3.2",
+    "@web3-onboard/injected-wallets": "^2.11.2",
+    "@web3-onboard/ledger": "^2.7.1",
+    "@web3-onboard/react": "^2.10.0",
+    "@web3-onboard/transaction-preview": "^2.1.2",
+    "@web3-onboard/trezor": "^2.4.6",
+    "@web3-onboard/trust": "^2.1.2",
+    "@web3-onboard/walletconnect": "^2.6.1",
     "next": "15.0.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "requesthub": "file:"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.4.0",
+    "requesthub": "file:",
+    "wagmi": "^2.13.3"
   },
   "devDependencies": {
     "@types/node": "^20",
