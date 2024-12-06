@@ -1,12 +1,12 @@
 'use client';
 import Navbar from '@/components/Navbar';
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useConnectWallet } from '@web3-onboard/react';
 import { ethers } from 'ethers';
 import '@/styles/globals.css';
 
 export default function Home() {
-  const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
+  const [{ wallet }, connect] = useConnectWallet();
   const [ethersProvider, setEthersProvider] =
     useState<ethers.providers.Web3Provider | null>(null);
 
