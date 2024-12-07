@@ -17,6 +17,10 @@ interface Request {
 }
 
 const RequestCard = ({ request }: { request: Request }) => {
+  const formatAddress = (address?: string) => {
+    return address ? `${address.slice(0, 10)}....${address.slice(-10)}` : 'N/A';
+  };
+
   return (
     <div className='bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300'>
       <div className='p-4'>
@@ -29,16 +33,19 @@ const RequestCard = ({ request }: { request: Request }) => {
         </div>
         <div className='bg-gray-50 p-3 rounded-b-lg'>
           <p className='text-gray-600 mb-1 text-sm'>
-            <strong>Payer:</strong> {request.payer}
+            <strong>Payer:</strong> {formatAddress(request.payer)}
           </p>
           <p className='text-gray-600 mb-1 text-sm'>
-            <strong>Payee:</strong> {request.payee}
+            <strong>Payee:</strong> {formatAddress(request.payee)}
           </p>
           <p className='text-gray-600 mb-1 text-sm'>
             <strong>Payment Network:</strong> {request.paymentNetwork}
           </p>
           <p className='text-gray-600 mb-1 text-sm'>
             <strong>Expected Amount:</strong> {request.expectedAmount}
+          </p>
+          <p className='text-gray-600 mb-1 text-sm'>
+            <strong>Description: </strong> {request.description}
           </p>
         </div>
         <div className='flex items-center justify-between p-3'>

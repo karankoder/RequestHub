@@ -25,9 +25,11 @@ interface ContextType {
     payee?: string;
     date: string;
     expectedAmount: number;
-    paymentNetwork?: string;
+    paymentNetwork?: string | undefined;
     balance?: number;
     timeStamp: number;
+    currencyNetwork: string | undefined;
+    currencyType: string | undefined;
   }>;
 }
 
@@ -56,24 +58,28 @@ export const Provider = ({ children }: { children: ReactNode }) => {
           value: wallet?.accounts[0].address.toLowerCase() as string,
         })
         .then((requests) => {
+          console.log(requests);
           const requestDatas = requests.map((request) => {
             const data = request.getData();
+            console.log(data);
             return {
               id: data.requestId,
               title: data.requestId,
-              description: data.contentData.description || 'No Description',
+              description: data.contentData.reason || '',
               status:
                 data.balance?.balance &&
                 data.balance.balance >= data.expectedAmount
                   ? Types.RequestLogic.STATE.ACCEPTED
                   : Types.RequestLogic.STATE.PENDING,
-              payer: data.payer?.value || '',
-              payee: data.payee?.value || '',
+              payer: (data.payer?.value || '').toLowerCase(),
+              payee: (data.payee?.value || '').toLowerCase(),
               date: new Date(data.timestamp * 1000).toLocaleDateString(),
               expectedAmount: Number(data.expectedAmount || 0) / 1e18,
               balance: Number(data.balance?.balance || 0) / 1e18,
               paymentNetwork: data.currencyInfo.network,
               timeStamp: data.timestamp,
+              currencyNetwork: data.currencyInfo.network,
+              currencyType: data.currencyInfo.type,
             };
           });
           console.log(requestDatas);
