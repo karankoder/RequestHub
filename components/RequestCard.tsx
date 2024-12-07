@@ -5,13 +5,15 @@ import { Types } from '@requestnetwork/request-client.js';
 interface Request {
   id: string;
   title: string;
-  payer: string;
-  payee: string;
-  paymentNetwork: string;
-  expectedAmount: Types.RequestLogic.Amount;
-  date: string;
-  status: Types.RequestLogic.STATE;
   description: string;
+  status: Types.RequestLogic.STATE;
+  payer?: string;
+  payee?: string;
+  date: string;
+  expectedAmount: number;
+  paymentNetwork?: string;
+  balance?: number;
+  timeStamp: number;
 }
 
 const RequestCard = ({ request }: { request: Request }) => {

@@ -5,9 +5,22 @@ import { FaSearch } from 'react-icons/fa';
 import RequestCard from '@/components/RequestCard';
 
 const Page = () => {
-  const { requests } = useAppContext();
+  const { requests, wallet } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+
+  const filteredRequests = requests.filter((request) => {
+    return (
+      (statusFilter === '' || request.status === statusFilter.toLowerCase()) &&
+      (typeFilter === '' ||
+        (typeFilter === 'Paid'
+          ? request.payer?.toLowerCase() ===
+            wallet?.accounts[0].address.toLowerCase()
+          : request.payee?.toLowerCase() ===
+            wallet?.accounts[0].address.toLowerCase()))
+    );
+  });
 
   return (
     <div className='container mx-auto p-4'>
@@ -27,18 +40,29 @@ const Page = () => {
           />
           <FaSearch className='absolute left-3 top-3 text-gray-400' />
         </div>
-        <select
-          className='border border-gray-300 rounded-full p-2 ml-4 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-md'
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value=''>All Statuses</option>
-          <option value='Pending'>Pending</option>
-          <option value='Accepted'>Accepted</option>
-        </select>
+        <div className='flex items-center'>
+          <select
+            className='border border-gray-300 rounded-full p-2 ml-4 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-md'
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value=''>All Statuses</option>
+            <option value='Pending'>Pending</option>
+            <option value='Accepted'>Accepted</option>
+          </select>
+          <select
+            className='border border-gray-300 rounded-full p-2 ml-4 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-md'
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+          >
+            <option value=''>All Types</option>
+            <option value='Paid'>Paid</option>
+            <option value='Received'>Received</option>
+          </select>
+        </div>
       </div>
       <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-        {requests.map((request) => (
+        {filteredRequests.map((request) => (
           <RequestCard key={request.id} request={request} />
         ))}
       </div>
