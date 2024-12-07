@@ -1,14 +1,16 @@
 import React from 'react';
 import { FaEthereum } from 'react-icons/fa';
+import { Types } from '@requestnetwork/request-client.js';
 
 interface Request {
+  id: string;
   title: string;
   payer: string;
   payee: string;
   paymentNetwork: string;
-  expectedAmount: string;
+  expectedAmount: Types.RequestLogic.Amount;
   date: string;
-  status: string;
+  status: Types.RequestLogic.STATE;
   description: string;
 }
 
@@ -41,7 +43,7 @@ const RequestCard = ({ request }: { request: Request }) => {
           <span className='text-xs text-gray-500'>{request.date}</span>
           <span
             className={`px-2 py-1 text-xs font-medium rounded-full ${
-              request.status === 'Pending'
+              request.status === 'pending'
                 ? 'bg-yellow-100 text-yellow-800'
                 : 'bg-green-100 text-green-800'
             }`}

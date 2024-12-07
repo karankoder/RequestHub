@@ -11,10 +11,24 @@ import { useConnectWallet } from '@web3-onboard/react';
 import { initializeRequestNetwork } from './initRequestNetwork';
 import type { RequestNetwork } from '@requestnetwork/request-client.js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Types } from '@requestnetwork/request-client.js';
 
 interface ContextType {
   wallet: WalletState | null;
   requestNetwork: RequestNetwork | null;
+  requests: Array<{
+    id: string;
+    title: string;
+    description: string;
+    status: Types.RequestLogic.STATE;
+    payer?: string;
+    payee?: string;
+    date: string;
+    expectedAmount: number;
+    paymentNetwork?: string;
+    balance?: number;
+    timeStamp: number;
+  }>;
 }
 
 const Context = createContext<ContextType | undefined>(undefined);
@@ -25,6 +39,7 @@ export const Provider = ({ children }: { children: ReactNode }) => {
   const [requestNetwork, setRequestNetwork] = useState<RequestNetwork | null>(
     null
   );
+  const [requests, setRequests] = useState<ContextType['requests']>([]);
 
   useEffect(() => {
     if (wallet) {
@@ -33,11 +48,46 @@ export const Provider = ({ children }: { children: ReactNode }) => {
     }
   }, [wallet]);
 
+  useEffect(() => {
+    if (wallet) {
+      requestNetwork
+        ?.fromIdentity({
+          type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
+          value: wallet?.accounts[0].address.toLowerCase() as string,
+        })
+        .then((requests) => {
+          const requestDatas = requests.map((request) => {
+            const data = request.getData();
+            return {
+              id: data.requestId,
+              title: data.requestId,
+              description: data.contentData.description || 'No Description',
+              status:
+                data.balance?.balance &&
+                data.balance.balance >= data.expectedAmount
+                  ? Types.RequestLogic.STATE.ACCEPTED
+                  : Types.RequestLogic.STATE.PENDING,
+              payer: data.payer?.value || '',
+              payee: data.payee?.value || '',
+              date: new Date(data.timestamp * 1000).toLocaleDateString(),
+              expectedAmount: Number(data.expectedAmount || 0) / 1e18,
+              balance: Number(data.balance?.balance || 0) / 1e18,
+              paymentNetwork: data.currencyInfo.network,
+              timeStamp: data.timestamp,
+            };
+          });
+          console.log(requestDatas);
+          setRequests(requestDatas);
+        });
+    }
+  }, [wallet, requestNetwork]);
+
   return (
     <Context.Provider
       value={{
         wallet,
         requestNetwork,
+        requests,
       }}
     >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

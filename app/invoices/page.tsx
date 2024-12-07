@@ -1,57 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAppContext } from '@/utils/context';
-import { useConnectWallet } from '@web3-onboard/react';
-import { Types } from '@requestnetwork/request-client.js';
 import { FaSearch } from 'react-icons/fa';
 import RequestCard from '@/components/RequestCard';
 
 const Page = () => {
-  const [{ wallet }] = useConnectWallet();
-  const { requestNetwork } = useAppContext();
+  const { requests } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [requests, setRequests] = useState<
-    Array<{
-      id: string;
-      title: string;
-      description: string;
-      status: Types.RequestLogic.STATE;
-      payer?: string;
-      payee?: string;
-      date: string;
-      expectedAmount: Types.RequestLogic.Amount;
-      paymentNetwork?: string;
-    }>
-  >([]);
-
-  useEffect(() => {
-    if (wallet) {
-      requestNetwork
-        ?.fromIdentity({
-          type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
-          value: wallet?.accounts[0].address.toLowerCase() as string,
-        })
-        .then((requests) => {
-          const requestDatas = requests.map((request) => {
-            const data = request.getData();
-            console.log(data);
-            return {
-              id: data.requestId,
-              title: data.requestId,
-              description: data.contentData.description || 'No Description',
-              status: data.state,
-              payer: data.payer?.value || '',
-              payee: data.payee?.value || '',
-              date: new Date(data.timestamp * 1000).toLocaleDateString(),
-              expectedAmount: data.expectedAmount,
-              paymentNetwork: data.currencyInfo.network,
-            };
-          });
-          setRequests(requestDatas);
-        });
-    }
-  }, [wallet, requestNetwork]);
 
   return (
     <div className='container mx-auto p-4'>
