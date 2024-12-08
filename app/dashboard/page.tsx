@@ -125,7 +125,7 @@ const Dashboard: React.FC = () => {
     requests: ContextType['requests'],
     walletAddress: string
   ) => {
-    const now = new Date('12-06-2024');
+    const now = new Date();
     const dailyData = requests.reduce((acc, request) => {
       const requestDate = new Date(request.date);
       if (requestDate.toDateString() === now.toDateString()) {
@@ -168,7 +168,7 @@ const Dashboard: React.FC = () => {
   };
 
   const filterData = (requests: ContextType['requests']) => {
-    const now = new Date('12-06-2024');
+    const now = new Date();
     if (filter === 'thisWeek') {
       return getWeekData(requests, walletAddress || '0');
     } else if (filter === 'thisMonth') {
