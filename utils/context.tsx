@@ -110,3 +110,11 @@ export const useAppContext = () => {
   }
   return context;
 };
+
+// New method to get overdue requests
+export const getOverdueRequests = (requests: ContextType['requests']) => {
+  const currentDate = new Date();
+  return requests.filter(
+    (request) => request.dueDate && new Date(request.dueDate) < currentDate
+  );
+};

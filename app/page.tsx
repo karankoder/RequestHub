@@ -22,7 +22,7 @@ export default function Home() {
   }, [wallet]);
   console.log(ethersProvider);
   return (
-    <div className='no-scrollbar  overflow-auto min-h-screen bg-blue-50'>
+    <div className='no-scrollbar min-h-screen bg-blue-50'>
       <Navbar />
       <header className='bg-green-600 text-white py-20 no-scrollbar'>
         <div className='container mx-auto text-center'>
