@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
     requests: ContextType['requests'],
     walletAddress: string
   ) => {
-    const now = new Date('12-06-2024');
+    const now = new Date();
     const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);

@@ -52,7 +52,7 @@ export const onboardConfig = {
   ],
   appMetadata: {
     name: 'RequestHub',
-    icon: 'peer-to-peer.png',
+    icon: 'graph2.png',
     description: 'RequestHub is a decentralized request platform.',
   },
 };
