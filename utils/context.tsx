@@ -30,6 +30,7 @@ export interface ContextType {
     timeStamp: number;
     currencyNetwork: string | undefined;
     currencyType: string | undefined;
+    dueDate: string | undefined;
   }>;
 }
 
@@ -80,6 +81,7 @@ export const Provider = ({ children }: { children: ReactNode }) => {
               timeStamp: data.timestamp,
               currencyNetwork: data.currencyInfo.network,
               currencyType: data.currencyInfo.type,
+              dueDate: data.contentData.dueDate,
             };
           });
           console.log(requestDatas);
