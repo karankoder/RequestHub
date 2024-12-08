@@ -4,21 +4,26 @@ RequestHub is a decentralized application built on top of the Request Network. U
 
 ## Getting Started
 
-First, run the development server:
+To run the development server, use any of the following commands based on your package manager:
 
-bash
+# Using npm
+
+npm install
 npm run dev
 
-# or
+# Using yarn
 
+yarn install
 yarn dev
 
-# or
+# Using pnpm
 
+pnpm install
 pnpm dev
 
-# or
+# Using bun
 
+bun install
 bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

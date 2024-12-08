@@ -25,6 +25,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       style={{ filter: 'invert(0)' }}
       className={poppins.className}
     >
+      <head>
+        <link rel='icon' href='/graph2.svg' />
+        <title>RequestHub</title>
+      </head>
       <body className='no-scrollbar'>
         <Web3OnboardProvider web3Onboard={web3Onboard}>
           <WagmiProvider config={wagmiConfig}>
