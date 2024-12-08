@@ -29,8 +29,10 @@ const CreditReport: React.FC<CreditReportProps> = ({ score }) => {
   const [isTooltipVisible, setTooltipVisible] = useState(false);
 
   const getScoreColor = (score: number) => {
-    if (score >= 750) return 'text-green-500';
-    if (score >= 650) return 'text-yellow-500';
+    if (score >= 800) return 'text-green-500';
+    if (score >= 740) return 'text-blue-500';
+    if (score >= 670) return 'text-yellow-500';
+    if (score >= 580) return 'text-orange-500';
     return 'text-red-500';
   };
 
@@ -64,11 +66,15 @@ const CreditReport: React.FC<CreditReportProps> = ({ score }) => {
           </div>
         </div>
         <p className='mt-2 text-lg text-gray-700'>
-          {score >= 750
+          {score >= 800
             ? 'Excellent'
-            : score >= 650
+            : score >= 740
+            ? 'Very Good'
+            : score >= 670
             ? 'Good'
-            : score >= 0
+            : score >= 580
+            ? 'Fair'
+            : score >= 300
             ? 'Poor'
             : 'Loading...'}
         </p>

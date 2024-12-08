@@ -108,7 +108,7 @@ const AnalyticsPage: React.FC = () => {
   console.log(groupedRequests);
 
   return (
-    <div className='p-4'>
+    <div className='p-4' style={{ backgroundColor: '#f3f4f6' }}>
       <header className='mb-6'>
         <h1 className='text-4xl font-extrabold text-center text-white bg-gradient-to-r from-green-600 to-green-400 p-4 rounded-lg shadow-md'>
           Analytics
@@ -120,7 +120,6 @@ const AnalyticsPage: React.FC = () => {
       <div className='flex flex-wrap gap-4'>
         {Object.keys(groupedRequests)
           .filter((address) => address.toLowerCase() !== walletAddress)
-          .slice(0, 4)
           .map((address, index) => (
             <div className='flex-1 min-w-[calc(33.333%-32px)]' key={index}>
               <AddressCard

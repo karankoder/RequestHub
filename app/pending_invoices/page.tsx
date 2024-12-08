@@ -1,10 +1,18 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext, ContextType } from '@/utils/context';
 import { Types } from '@requestnetwork/request-client.js';
+import Loader from '@/components/Loader';
 
 const OverduePage = () => {
   const { requests }: { requests: ContextType['requests'] } = useAppContext();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (requests.length > 0) {
+      setLoading(false);
+    }
+  }, [requests]);
 
   const getPendingRequests = (requests: ContextType['requests']) => {
     return requests.filter(
@@ -53,7 +61,9 @@ const OverduePage = () => {
           Pending Payments
         </h1>
       </header>
-      {overdueRequests.length === 0 ? (
+      {loading ? (
+        <Loader></Loader>
+      ) : overdueRequests.length === 0 ? (
         <p>No overdue payments found.</p>
       ) : (
         <table className='w-full border-collapse mt-5'>

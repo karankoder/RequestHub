@@ -11,7 +11,6 @@ export default function Home() {
     useState<ethers.providers.Web3Provider | null>(null);
 
   useEffect(() => {
-    console.log(wallet);
     if (wallet) {
       setEthersProvider(
         new ethers.providers.Web3Provider(wallet.provider, 'any')
@@ -20,18 +19,18 @@ export default function Home() {
       setEthersProvider(null);
     }
   }, [wallet]);
-  console.log(ethersProvider);
+
   return (
-    <div className='no-scrollbar min-h-screen bg-blue-50'>
+    <div className='no-scrollbar min-h-screen bg-gradient-to-r from-blue-50 to-blue-100'>
       <Navbar />
-      <header className='bg-green-600 text-white py-20 no-scrollbar'>
+      <header className='bg-gradient-to-r from-green-500 to-green-700 text-white py-20 no-scrollbar'>
         <div className='container mx-auto text-center'>
-          <h1 className='text-5xl font-bold mb-4'>Welcome to RequestHub</h1>
-          <p className='text-xl mb-8'>
+          <h1 className='text-6xl font-extrabold mb-4'>Welcome to RequestHub</h1>
+          <p className='text-2xl mb-8'>
             Your gateway to insightful data from the Request Network.
           </p>
           <button
-            className='px-8 py-3 bg-white text-green-400 font-semibold rounded hover:bg-gray-200'
+            className='px-8 py-3 bg-white text-green-600 font-semibold rounded-full shadow-lg hover:bg-gray-200 transition duration-300'
             onClick={() => connect()}
           >
             Get Started
@@ -46,19 +45,26 @@ export default function Home() {
           </p>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
             <div className='bg-white p-6 rounded-lg shadow-lg'>
-              <h3 className='text-xl font-bold mb-2'>Feature One</h3>
-              <p className='text-gray-700'>Description of feature one.</p>
+              <h3 className='text-xl font-bold mb-2'>Dashboard</h3>
+              <p className='text-gray-700'>
+                Get an overview of your transactions, inflow, outflow, and outstanding balances.
+              </p>
             </div>
             <div className='bg-white p-6 rounded-lg shadow-lg'>
-              <h3 className='text-xl font-bold mb-2'>Feature Two</h3>
-              <p className='text-gray-700'>Description of feature two.</p>
+              <h3 className='text-xl font-bold mb-2'>Invoices</h3>
+              <p className='text-gray-700'>
+                Manage and filter your invoices with ease.
+              </p>
             </div>
             <div className='bg-white p-6 rounded-lg shadow-lg'>
-              <h3 className='text-xl font-bold mb-2'>Feature Three</h3>
-              <p className='text-gray-700'>Description of feature three.</p>
+              <h3 className='text-xl font-bold mb-2'>Analytics</h3>
+              <p className='text-gray-700'>
+                Analyze your transaction history and calculate your credit score.
+              </p>
             </div>
           </div>
         </section>
+        
       </main>
       <footer className='bg-gray-800 text-white py-8'>
         <div className='container mx-auto text-center'>
