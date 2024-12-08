@@ -32,9 +32,12 @@ const Page = () => {
       fromDate,
       toDate,
     } = filters;
-    const requestDate = new Date(request.date);
-    const from = fromDate ? new Date(fromDate) : null;
-    const to = toDate ? new Date(toDate) : null;
+    const requestDate = new Date(request.date).toLocaleDateString();
+
+    const from = fromDate ? new Date(fromDate).toLocaleDateString() : null;
+    const to = toDate ? new Date(toDate).toLocaleDateString() : null;
+    console.log(fromDate);
+    console.log('kk', requestDate, 'from', from);
     return (
       (searchTerm === '' ||
         request.description

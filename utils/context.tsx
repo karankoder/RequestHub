@@ -13,7 +13,7 @@ import type { RequestNetwork } from '@requestnetwork/request-client.js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Types } from '@requestnetwork/request-client.js';
 
-interface ContextType {
+export interface ContextType {
   wallet: WalletState | null;
   requestNetwork: RequestNetwork | null;
   requests: Array<{

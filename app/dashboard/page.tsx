@@ -18,6 +18,7 @@ import {
 import { useAppContext } from '@/utils/context';
 import { Types } from '@requestnetwork/request-client.js';
 import { useConnectWallet } from '@web3-onboard/react';
+import { ContextType } from '@/utils/context';
 
 const Title: React.FC<{ text: string }> = ({ text }) => (
   <h1 className='text-center text-4xl font-bold mb-10 text-gray-800'>{text}</h1>
@@ -25,7 +26,8 @@ const Title: React.FC<{ text: string }> = ({ text }) => (
 
 const Dashboard: React.FC = () => {
   const [isClient, setIsClient] = useState(false);
-  const { requests } = useAppContext();
+  const [filter, setFilter] = useState('today');
+  const { requests }: { requests: ContextType['requests'] } = useAppContext();
   const [{ wallet }] = useConnectWallet();
 
   useEffect(() => {
@@ -34,32 +36,209 @@ const Dashboard: React.FC = () => {
 
   const walletAddress = wallet?.accounts[0].address.toLowerCase();
 
-  const data = requests
-    .filter(
-      (request) =>
-        new Date(request.date).toDateString() ===
-        new Date('12-06-2024').toDateString()
-    )
-    .map((request) => ({
-      name: new Date(request.timeStamp * 1000).toLocaleTimeString('default', {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      inflow:
-        request.status === Types.RequestLogic.STATE.ACCEPTED &&
-        request.payee?.toLowerCase() === walletAddress
-          ? request.balance
-          : 0,
-      outflow:
-        request.status === Types.RequestLogic.STATE.ACCEPTED &&
-        request.payer?.toLowerCase() === walletAddress
-          ? request.balance
-          : 0,
-    }));
-  console.log(data);
+  const getWeekData = (
+    requests: ContextType['requests'],
+    walletAddress: string
+  ) => {
+    const now = new Date('12-06-2024');
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-  const totalInflow = data.reduce((acc, item) => acc + (item.inflow || 0), 0);
-  const totalOutflow = data.reduce((acc, item) => acc + (item.outflow || 0), 0);
+    const weekData = requests.reduce((acc, request) => {
+      const requestDate = new Date(request.date);
+      if (requestDate >= startOfWeek && requestDate <= endOfWeek) {
+        const day = requestDate.toLocaleDateString('default', {
+          weekday: 'short',
+        });
+        if (!acc[day]) {
+          acc[day] = { name: day, inflow: 0, outflow: 0, net: 0 };
+        }
+        if (request.status === Types.RequestLogic.STATE.ACCEPTED) {
+          if (request.payee?.toLowerCase() === walletAddress) {
+            acc[day].inflow += request.balance || 0;
+            acc[day].net += request.balance || 0;
+          }
+          if (request.payer?.toLowerCase() === walletAddress) {
+            acc[day].outflow += request.balance || 0;
+            acc[day].net -= request.balance || 0;
+          }
+        }
+      }
+      return acc;
+    }, {} as { [key: string]: { name: string; inflow: number; outflow: number; net: number } });
+
+    const orderedDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return orderedDays.map((day) => weekData[day]).filter(Boolean);
+  };
+
+  const getMonthlyData = (
+    requests: ContextType['requests'],
+    walletAddress: string
+  ) => {
+    const monthlyData = requests.reduce(
+      (
+        acc: {
+          [key: string]: {
+            name: string;
+            inflow: number;
+            outflow: number;
+            net: number;
+          };
+        },
+        request
+      ) => {
+        const date = new Date(request.date).toLocaleString('default', {
+          day: '2-digit',
+          month: 'short',
+        });
+        const inflow =
+          request.status === Types.RequestLogic.STATE.ACCEPTED &&
+          request.payee?.toLowerCase() === walletAddress
+            ? request.balance || 0
+            : 0;
+        const outflow =
+          request.status === Types.RequestLogic.STATE.ACCEPTED &&
+          request.payer?.toLowerCase() === walletAddress
+            ? request.balance || 0
+            : 0;
+        const net = inflow - outflow;
+
+        if (!acc[date]) {
+          acc[date] = { name: date, inflow: 0, outflow: 0, net: 0 };
+        }
+        acc[date].inflow += inflow;
+        acc[date].outflow += outflow;
+        acc[date].net += net;
+        return acc;
+      },
+      {}
+    );
+
+    return Object.values(monthlyData).reverse();
+  };
+
+  const getDailyOutstandingData = (
+    requests: ContextType['requests'],
+    walletAddress: string
+  ) => {
+    const now = new Date('12-06-2024');
+    const dailyData = requests.reduce((acc, request) => {
+      const requestDate = new Date(request.date);
+      if (requestDate.toDateString() === now.toDateString()) {
+        const time = new Date(request.timeStamp * 1000).toLocaleTimeString(
+          'default',
+          {
+            hour: '2-digit',
+            minute: '2-digit',
+          }
+        );
+        const net =
+          request.status === Types.RequestLogic.STATE.ACCEPTED &&
+          (request.balance || 0) *
+            (request.payee?.toLowerCase() === walletAddress ? 1 : -1);
+
+        if (!acc[time]) {
+          acc[time] = [];
+        }
+        acc[time].push({ name: time, net: typeof net === 'number' ? net : 0 });
+      }
+      return acc;
+    }, {} as { [key: string]: { name: string; net: number }[] });
+
+    return Object.values(dailyData).flat();
+  };
+  console.log('hello', getDailyOutstandingData(requests, walletAddress || '0'));
+  const getOutstandingData = (
+    requests: ContextType['requests'],
+    filter: string,
+    walletAddress: string
+  ) => {
+    if (filter === 'thisWeek') {
+      return getWeekData(requests, walletAddress);
+    } else if (filter === 'thisMonth') {
+      return getMonthlyData(requests, walletAddress);
+    } else if (filter === 'today') {
+      return getDailyOutstandingData(requests, walletAddress);
+    }
+    return [];
+  };
+
+  const filterData = (requests: ContextType['requests']) => {
+    const now = new Date('12-06-2024');
+    if (filter === 'thisWeek') {
+      return getWeekData(requests, walletAddress || '0');
+    } else if (filter === 'thisMonth') {
+      return getMonthlyData(requests, walletAddress || '0');
+    }
+
+    return requests
+      .filter((request) => {
+        const requestDate = new Date(request.date);
+        if (filter === 'today') {
+          return requestDate.toDateString() === now.toDateString();
+        }
+        return false;
+      })
+      .map((request) => ({
+        name:
+          filter === 'today'
+            ? new Date(request.timeStamp * 1000).toLocaleTimeString('default', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            : new Date(request.timeStamp * 1000).toLocaleDateString('default', {
+                day: '2-digit',
+                month: 'short',
+              }),
+        inflow:
+          request.status === Types.RequestLogic.STATE.ACCEPTED &&
+          request.payee?.toLowerCase() === walletAddress
+            ? request.balance
+            : 0,
+        outflow:
+          request.status === Types.RequestLogic.STATE.ACCEPTED &&
+          request.payer?.toLowerCase() === walletAddress
+            ? request.balance
+            : 0,
+      }));
+  };
+
+  const totalInflow = requests.reduce(
+    (acc, request) =>
+      request.status === Types.RequestLogic.STATE.ACCEPTED &&
+      request.payee?.toLowerCase() === walletAddress
+        ? acc + (request.balance || 0)
+        : acc,
+    0
+  );
+
+  const totalOutflow = requests.reduce(
+    (acc, request) =>
+      request.status === Types.RequestLogic.STATE.ACCEPTED &&
+      request.payer?.toLowerCase() === walletAddress
+        ? acc + (request.balance || 0)
+        : acc,
+    0
+  );
+
+  const getFilteredTotals = (data: any[]) => {
+    return data.reduce(
+      (acc, item) => {
+        acc.inflow += item.inflow || 0;
+        acc.outflow += item.outflow || 0;
+        return acc;
+      },
+      { inflow: 0, outflow: 0 }
+    );
+  };
+
+  const filteredData = filterData(requests);
+  const { inflow: filteredInflow, outflow: filteredOutflow } = getFilteredTotals(filteredData);
+  const netOutstanding = filteredInflow - filteredOutflow;
+
+  const data = filterData(requests);
+  console.log(data);
 
   console.log(totalInflow, totalOutflow);
 
@@ -92,32 +271,31 @@ const Dashboard: React.FC = () => {
       status: request.status,
     }));
 
-  const monthlyData = requests.reduce(
-    (acc: { [key: string]: { name: string; net: number } }, request) => {
-      const month = new Date(request.date).toLocaleString('default', {
-        month: 'short',
-        year: 'numeric',
-      });
-      const net =
-        request.status === Types.RequestLogic.STATE.ACCEPTED &&
-        (request.balance || 0) *
-          (request.payee?.toLowerCase() === walletAddress ? 1 : -1);
-
-      if (!acc[month]) {
-        acc[month] = { name: month, net: 0 };
-      }
-      acc[month].net += typeof net === 'number' ? net : 0;
-      return acc;
-    },
-    {}
+  const barGraphData = getOutstandingData(
+    requests,
+    filter,
+    walletAddress || '0'
   );
-
-  const barGraphData = Object.values(monthlyData);
   console.log('karan', barGraphData);
 
   return (
     <div className='p-5 font-sans bg-gradient-to-r from-blue-50 to-indigo-100 min-h-screen'>
       <Title text='Dashboard' />
+      <div className='mb-5'>
+        <label htmlFor='filter' className='mr-2'>
+          Filter:
+        </label>
+        <select
+          id='filter'
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className='p-2 border rounded'
+        >
+          <option value='today'>Today</option>
+          <option value='thisWeek'>This Week</option>
+          <option value='thisMonth'>This Month</option>
+        </select>
+      </div>
       <div className='grid grid-cols-1 md:grid-cols-4 gap-5 mb-10'>
         <div
           className='bg-white p-5 rounded-lg text-center shadow-lg'
@@ -155,12 +333,21 @@ const Dashboard: React.FC = () => {
       </div>
       {isClient && (
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10'>
-          <div className='bg-white p-5 rounded-lg shadow-lg'>
+          <div className='bg-white p-5 rounded-lg shadow-lg relative'>
             <h2 className='text-xl mb-2 text-gray-700'>
-              Today's Inflow vs Outflow
+              {filter === 'today'
+                ? "Today's"
+                : filter === 'thisWeek'
+                ? "This Week's"
+                : "This Month's"}{' '}
+              Inflow vs Outflow
             </h2>
+            <div className='absolute top-0 right-0 mt-2 mr-2 text-right'>
+              <p className='text-lg text-green-500'>Total Inflow: {filteredInflow.toFixed(4)} ETH</p>
+              <p className='text-lg text-red-500'>Total Outflow: {filteredOutflow.toFixed(4)} ETH</p>
+            </div>
             <ResponsiveContainer width='100%' height={300}>
-              <LineChart data={data}>
+              <LineChart data={filteredData}>
                 <CartesianGrid strokeDasharray='3 3' />
                 <XAxis dataKey='name' />
                 <YAxis />
@@ -181,10 +368,18 @@ const Dashboard: React.FC = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className='bg-white p-5 rounded-lg shadow-lg'>
+          <div className='bg-white p-5 rounded-lg shadow-lg relative'>
             <h2 className='text-xl mb-2 text-gray-700'>
-              Monthly Outstanding Bar Graph
+              {filter === 'today'
+                ? "Today's"
+                : filter === 'thisWeek'
+                ? "This Week's"
+                : "This Month's"}{' '}
+              Outstanding Bar Graph
             </h2>
+            <div className='absolute top-0 right-0 mt-2 mr-2 text-right'>
+              <p className='text-lg text-blue-500'>Net Outstanding: {netOutstanding.toFixed(4)} ETH</p>
+            </div>
             <ResponsiveContainer width='100%' height={300}>
               <BarChart data={barGraphData}>
                 <CartesianGrid strokeDasharray='3 3' />
