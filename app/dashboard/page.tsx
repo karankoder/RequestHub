@@ -19,9 +19,12 @@ import { useAppContext } from '@/utils/context';
 import { Types } from '@requestnetwork/request-client.js';
 import { useConnectWallet } from '@web3-onboard/react';
 import { ContextType } from '@/utils/context';
+import Link from 'next/link';
 
 const Title: React.FC<{ text: string }> = ({ text }) => (
-  <h1 className='text-center text-4xl font-bold mb-10 text-gray-800'>{text}</h1>
+  <h1 className='text-4xl font-extrabold text-center text-white bg-gradient-to-r from-green-600 to-green-400 p-4 rounded-lg shadow-md'>
+    {text}
+  </h1>
 );
 
 const Dashboard: React.FC = () => {
@@ -234,7 +237,8 @@ const Dashboard: React.FC = () => {
   };
 
   const filteredData = filterData(requests);
-  const { inflow: filteredInflow, outflow: filteredOutflow } = getFilteredTotals(filteredData);
+  const { inflow: filteredInflow, outflow: filteredOutflow } =
+    getFilteredTotals(filteredData);
   const netOutstanding = filteredInflow - filteredOutflow;
 
   const data = filterData(requests);
@@ -278,25 +282,48 @@ const Dashboard: React.FC = () => {
   );
   console.log('karan', barGraphData);
 
+  const handlePendingInvoicesClick = () => {
+    window.location.href = '/pending_invoices';
+  };
+
+  const chartStyles = {
+    backgroundColor: 'white',
+    borderRadius: '0.5rem',
+    padding: '1rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  };
+
+  const tooltipStyles = {
+    backgroundColor: '#f5f5f5',
+    borderRadius: '0.5rem',
+    border: '1px solid #ddd',
+    padding: '0.5rem',
+  };
+
+  const axisStyles = {
+    stroke: '#8884d8',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+  };
+
+  const chartContainerStyles = {
+    backgroundColor: 'white',
+    borderRadius: '0.75rem',
+    padding: '1.5rem',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  };
+
+  const chartContainerHoverStyles = {
+    transform: 'scale(1.02)',
+    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
+  };
+
   return (
     <div className='p-5 font-sans bg-gradient-to-r from-blue-50 to-indigo-100 min-h-screen'>
       <Title text='Dashboard' />
-      <div className='mb-5'>
-        <label htmlFor='filter' className='mr-2'>
-          Filter:
-        </label>
-        <select
-          id='filter'
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className='p-2 border rounded'
-        >
-          <option value='today'>Today</option>
-          <option value='thisWeek'>This Week</option>
-          <option value='thisMonth'>This Month</option>
-        </select>
-      </div>
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-5 mb-10'>
+
+      <div className='grid grid-cols-1 md:grid-cols-4 gap-5 mb-2 mt-5'>
         <div
           className='bg-white p-5 rounded-lg text-center shadow-lg'
           title={`${totalInflow} ETH`}
@@ -324,16 +351,44 @@ const Dashboard: React.FC = () => {
             {totalOutstanding.toFixed(4)} ETH
           </p>
         </div>
-        <div className='bg-white p-5 rounded-lg text-center shadow-lg'>
+        <div
+          className='bg-white p-5 rounded-lg text-center shadow-lg'
+          onClick={handlePendingInvoicesClick}
+          style={{ cursor: 'pointer' }}
+        >
           <h2 className='text-xl mb-2 text-gray-700'>Pending Invoices</h2>
           <p className='text-3xl font-bold text-yellow-500'>
             {pendingInvoices}
           </p>
         </div>
       </div>
+      <div className='mb-5'>
+        <label htmlFor='filter' className='mr-2'>
+          Filter:
+        </label>
+        <select
+          id='filter'
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className='p-2 mt-2 border rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500'
+        >
+          <option value='today'>Today</option>
+          <option value='thisWeek'>This Week</option>
+          <option value='thisMonth'>This Month</option>
+        </select>
+      </div>
       {isClient && (
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10'>
-          <div className='bg-white p-5 rounded-lg shadow-lg relative'>
+          <div
+            className='relative'
+            style={chartContainerStyles}
+            onMouseEnter={(e) =>
+              Object.assign(e.currentTarget.style, chartContainerHoverStyles)
+            }
+            onMouseLeave={(e) =>
+              Object.assign(e.currentTarget.style, chartContainerStyles)
+            }
+          >
             <h2 className='text-xl mb-2 text-gray-700'>
               {filter === 'today'
                 ? "Today's"
@@ -343,32 +398,49 @@ const Dashboard: React.FC = () => {
               Inflow vs Outflow
             </h2>
             <div className='absolute top-0 right-0 mt-2 mr-2 text-right'>
-              <p className='text-lg text-green-500'>Total Inflow: {filteredInflow.toFixed(4)} ETH</p>
-              <p className='text-lg text-red-500'>Total Outflow: {filteredOutflow.toFixed(4)} ETH</p>
+              <p className='text-lg text-green-500'>
+                Total Inflow: {filteredInflow.toFixed(4)} ETH
+              </p>
+              <p className='text-lg text-red-500'>
+                Total Outflow: {filteredOutflow.toFixed(4)} ETH
+              </p>
             </div>
             <ResponsiveContainer width='100%' height={300}>
               <LineChart data={filteredData}>
-                <CartesianGrid strokeDasharray='3 3' />
-                <XAxis dataKey='name' />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray='3 3' stroke='#e0e0e0' />
+                <XAxis dataKey='name' {...axisStyles} />
+                <YAxis {...axisStyles} />
+                <Tooltip contentStyle={tooltipStyles} />
                 <Legend />
                 <Line
                   type='monotone'
                   dataKey='inflow'
-                  stroke='#8884d8'
+                  stroke='#00C49F'
                   strokeWidth={2}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
                 />
                 <Line
                   type='monotone'
                   dataKey='outflow'
-                  stroke='#82ca9d'
+                  stroke='#FF8042'
                   strokeWidth={2}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className='bg-white p-5 rounded-lg shadow-lg relative'>
+          <div
+            className='relative'
+            style={chartContainerStyles}
+            onMouseEnter={(e) =>
+              Object.assign(e.currentTarget.style, chartContainerHoverStyles)
+            }
+            onMouseLeave={(e) =>
+              Object.assign(e.currentTarget.style, chartContainerStyles)
+            }
+          >
             <h2 className='text-xl mb-2 text-gray-700'>
               {filter === 'today'
                 ? "Today's"
@@ -378,20 +450,35 @@ const Dashboard: React.FC = () => {
               Outstanding Bar Graph
             </h2>
             <div className='absolute top-0 right-0 mt-2 mr-2 text-right'>
-              <p className='text-lg text-blue-500'>Net Outstanding: {netOutstanding.toFixed(4)} ETH</p>
+              <p className='text-lg text-blue-500'>
+                Net Outstanding: {netOutstanding.toFixed(4)} ETH
+              </p>
             </div>
             <ResponsiveContainer width='100%' height={300}>
               <BarChart data={barGraphData}>
-                <CartesianGrid strokeDasharray='3 3' />
-                <XAxis dataKey='name' />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray='3 3' stroke='#e0e0e0' />
+                <XAxis dataKey='name' {...axisStyles} />
+                <YAxis {...axisStyles} />
+                <Tooltip contentStyle={tooltipStyles} />
                 <Legend />
-                <Bar dataKey='net' fill='#FFBB28' barSize={30} />
+                <Bar
+                  dataKey='net'
+                  fill='#FFBB28'
+                  barSize={30}
+                  radius={[10, 10, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className='bg-white p-5 rounded-lg shadow-lg'>
+          <div
+            style={chartContainerStyles}
+            onMouseEnter={(e) =>
+              Object.assign(e.currentTarget.style, chartContainerHoverStyles)
+            }
+            onMouseLeave={(e) =>
+              Object.assign(e.currentTarget.style, chartContainerStyles)
+            }
+          >
             <h2 className='text-xl mb-2 text-gray-700'>
               Inflow vs Outflow Distribution
             </h2>
@@ -419,12 +506,20 @@ const Dashboard: React.FC = () => {
                     />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={tooltipStyles} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className='bg-white p-5 rounded-lg shadow-lg'>
+          <div
+            style={chartContainerStyles}
+            onMouseEnter={(e) =>
+              Object.assign(e.currentTarget.style, chartContainerHoverStyles)
+            }
+            onMouseLeave={(e) =>
+              Object.assign(e.currentTarget.style, chartContainerStyles)
+            }
+          >
             <h2 className='text-xl mb-2 text-gray-700'>
               Accepted vs Pending Transactions
             </h2>
@@ -452,7 +547,7 @@ const Dashboard: React.FC = () => {
                     />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={tooltipStyles} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>

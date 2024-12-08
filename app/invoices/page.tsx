@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppContext } from '@/utils/context';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 import RequestCard from '@/components/RequestCard';
+import Loader from '@/components/Loader';
 
 const Page = () => {
   const { requests, wallet } = useAppContext();
@@ -18,6 +19,13 @@ const Page = () => {
     fromDate: '',
     toDate: '',
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (requests.length > 0) {
+      setLoading(false);
+    }
+  }, [requests]);
 
   const filteredRequests = requests.filter((request) => {
     const {
@@ -71,6 +79,7 @@ const Page = () => {
           Invoices
         </h1>
       </header>
+
       <div className='flex'>
         <aside className='w-1/5 p-4 bg-white rounded-lg shadow-md'>
           <h2 className='text-2xl text-gray-900 mb-4'>Filters</h2>
@@ -211,11 +220,15 @@ const Page = () => {
           </button>
         </aside>
         <main className='w-4/5 p-4'>
-          <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-            {filteredRequests.map((request) => (
-              <RequestCard key={request.id} request={request} />
-            ))}
-          </div>
+          {loading ? (
+            <Loader />
+          ) : (
+            <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+              {filteredRequests.map((request) => (
+                <RequestCard key={request.id} request={request} />
+              ))}
+            </div>
+          )}
         </main>
       </div>
     </div>

@@ -35,9 +35,9 @@ const CreditReport: React.FC<CreditReportProps> = ({ score }) => {
   };
 
   return (
-    <div className='flex flex-wrap md:flex-nowrap justify-center gap-2 p-1 bg-gray-50'>
-      <div className='flex flex-col items-center justify-center p-2 bg-white shadow-lg rounded-xl w-full md:w-1/2 hover:shadow-xl transition-shadow duration-300'>
-        <h2 className='text-3xl font-extrabold mb-1'>Your Credit Score</h2>
+    <div className='flex flex-wrap md:flex-nowrap justify-center gap-4 p-4 bg-gray-100'>
+      <div className='flex flex-col items-center justify-center p-4 bg-white shadow-lg rounded-2xl w-full md:w-1/2 hover:shadow-2xl transition-shadow duration-300 h-64'>
+        <h2 className='text-3xl font-extrabold mb-2'>Your Credit Score</h2>
         <div className='flex items-center'>
           <div className={`text-5xl font-extrabold ${getScoreColor(score)}`}>
             {score >= 0 ? score : <Loader />}
@@ -63,7 +63,7 @@ const CreditReport: React.FC<CreditReportProps> = ({ score }) => {
             )}
           </div>
         </div>
-        <p className='mt-1 text-lg text-gray-700'>
+        <p className='mt-2 text-lg text-gray-700'>
           {score >= 750
             ? 'Excellent'
             : score >= 650
@@ -74,24 +74,18 @@ const CreditReport: React.FC<CreditReportProps> = ({ score }) => {
         </p>
       </div>
 
-      <div className='flex flex-col p-2 bg-white shadow-lg rounded-xl w-full md:w-1/2 hover:shadow-xl transition-shadow duration-300'>
-        <h2 className='text-3xl font-extrabold mb-1'>About Credit Scores</h2>
+      <div className='flex flex-col p-4 bg-white shadow-lg rounded-2xl w-full md:w-1/2 hover:shadow-2xl transition-shadow duration-300 h-64'>
+        <h2 className='text-3xl font-extrabold mb-2'>About Credit Scores</h2>
         <p className='text-gray-700 text-md mb-2'>
           Your credit score represents your creditworthiness. It helps lenders
           assess the risk of lending you money.
         </p>
-        <h3 className='text-xl font-semibold mb-1'>Importance</h3>
+        <h3 className='text-xl font-semibold mb-2'>Importance</h3>
         <ul className='list-disc list-inside text-gray-700 text-md mb-2'>
           <li>Lower interest rates on loans.</li>
           <li>Faster loan approval and higher credit limits.</li>
           <li>Affects renting properties and job opportunities.</li>
-        </ul>
-        <h3 className='text-xl font-semibold mb-1'>Improvement Tips</h3>
-        <ul className='list-disc list-inside text-gray-700 text-md mb-2'>
-          <li>Pay bills on time.</li>
-          <li>Keep credit card balances low.</li>
-          <li>Don't close unused credit cards.</li>
-          <li>Limit new credit requests.</li>
+          <li>Improves financial stability.</li>
         </ul>
       </div>
     </div>

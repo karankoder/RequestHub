@@ -15,7 +15,7 @@ const Navbar = () => {
           <Link href='/dashboard'>Dashboard</Link>
         </li>
         <li className='text-gray-700 hover:text-green-500'>
-          <a href='#'>Contact</a>
+          <a href='/analytics'>Analytics</a>
         </li>
       </ul>
     </nav>

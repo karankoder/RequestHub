@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaEthereum } from 'react-icons/fa';
 import { Types } from '@requestnetwork/request-client.js';
+import Link from 'next/link';
 
 interface Request {
   id: string;
@@ -61,9 +62,14 @@ const RequestCard = ({ request }: { request: Request }) => {
           </span>
         </div>
         <div className='flex space-x-2 p-3'>
-          <button className='flex-1 bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 text-sm shadow-md'>
+          <Link
+            href={`https://scan.request.network/request/${request.id}`}
+            className='text-center flex-1 bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 text-sm shadow-md'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
             View
-          </button>
+          </Link>
           <button className='flex-1 bg-gray-200 text-gray-800 px-3 py-1 rounded-md hover:bg-gray-300 text-sm shadow-md'>
             Edit
           </button>
